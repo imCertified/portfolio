@@ -1,0 +1,4 @@
+# Linktree Clone
+## Introduction
+This project represents a copy of the core functionality of [Linktree](https://linktr.ee). Linktree is an online service whose core functionality allows individuals to host a single web page that hosts a collection of links related to them. For example, online influencers generally have a Linktree link in their social media bio sections. Upon clicking such a link, influencees are presented with a page of links relevant to the influencer (generally things like their Instagram, Facebook, Amazon storefront, or their personal website). The following picture shows an example of popular pop singer Katy Perry's Linktree page (truncated).<br />
+<img src='assets/kp-lt.PNG' alt='Katy Perry Linktree Front'>
