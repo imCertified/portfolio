@@ -5,13 +5,13 @@ I built a Linktree clone. You can find it at the link above. The data model is r
 
 # Introduction
 This project represents a copy of the core functionality of [Linktree](https://linktr.ee). Linktree is an online service whose core functionality allows individuals to host a single web page that hosts a collection of links related to them. For example, online influencers generally have a Linktree link in their social media bio sections. Upon clicking such a link, users are presented with a page of other links relevant to the influencer (generally things like their Instagram, Facebook, Amazon storefront, or their personal website). The following picture shows an example of popular singer Katy Perry's [Linktree page](https://linktr.ee/katyperry) (truncated). Clicking on any one of these list items would direct the user to the corresponding link.<br />
-<img src='assets/kp-lt.PNG' alt='Katy Perry Linktree Front'>
+<img src='assets/kp-lt.PNG' alt='Katy Perry Linktree Front'><br />
 
 
 # Implementation
 ## Architecture
 My Linktree clone has been implemented in somewhat of a 3-tier serverless SaaS architecture with a static webapp (React), API layer (API Gateway and Lambda), and a persistence layer (DynamoDB). It also uses a Cognito user pool, which is shared by all SaaS-like items in my portfolio, for signup and signin functionality. It was, like most projects in this portfolio, designed not to cost me tons of money at idle. However, it's also designed such that it could scale to a substantial number of concurrent users without failling over. CloudFront is used to cache the React webapp for lower latency reads and to cache common Trees to avoid hot DynamoDB partitions (and lower latency, of course).<br />
-<img src='assets/architecture.PNG' alt='Linktree Architecture'>
+<img src='assets/architecture.png' alt='Linktree Architecture'>
 
 ## Data Model
 The data model needed to be resilient enough to conform to somewhat strict security requirements, but also performant enough to allow for very fast retrieval of data via common access patterns. Far and away, the most common access pattern of this application would be to retrieve a set of links for a given tree. Also, the data needed to be constructed in such a way that common trees (like those for social media celebrities) could be cached at CloudFront. The data model I chose, while basic, supports all of this.<br /><br />
