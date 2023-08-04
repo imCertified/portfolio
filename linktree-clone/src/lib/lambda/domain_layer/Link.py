@@ -1,7 +1,6 @@
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Attr
 from ulid import ULID
-from Tree import Tree, UnownedTreeException
 
     
 
@@ -26,6 +25,9 @@ class Link:
             url (str): The URL that should be linked
             display_text (str): The text to be displayed for this Link
             is_explicit (bool): Flag to mark link as explicit
+        
+        Returns:
+            link (Link): The newly-created lin object
         '''
         print('Creating new Link object')
         link_id = str(ULID())

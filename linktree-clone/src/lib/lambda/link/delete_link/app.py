@@ -9,7 +9,6 @@ from utils import (
 from boto3 import client
 from os import getenv
 from Link import Link
-from Tree import UnownedTreeException
 
 sts = client('sts')
 
@@ -35,21 +34,14 @@ def lambda_handler(event, context):
             'statusCode': 500
         }
     
-    try:
-        session = assume_with_context(sts=sts, role_arn=getenv('WRITE_ROLE_ARN'), username=user)
-        ddb = session.resource('dynamodb')
-        table = ddb.Table(getenv('TABLE_NAME'))
-        Link.delete_in_table(
-            table=table,
-            link_id=link_id,
-            user=user
-        )
-    except UnownedTreeException:
-        print(f'User {user} does not own link {link_id}. Returning 403')
-        return {
-            'statusCode': 403,
-            'body': 'UnownedTreeException'
-        }
+    session = assume_with_context(sts=sts, role_arn=getenv('WRITE_ROLE_ARN'), username=user)
+    ddb = session.resource('dynamodb')
+    table = ddb.Table(getenv('TABLE_NAME'))
+    Link.delete_in_table(
+        table=table,
+        link_id=link_id,
+        user=user
+    )
     
     return {
         'statusCode': 200,

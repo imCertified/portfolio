@@ -9,7 +9,6 @@ from utils import (
 from boto3 import client
 from os import getenv
 from Link import Link
-from Tree import UnownedTreeException
 
 sts = client('sts')  # For assuming context-aware role
 
