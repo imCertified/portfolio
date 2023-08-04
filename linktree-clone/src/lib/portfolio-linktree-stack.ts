@@ -318,7 +318,6 @@ export class PortfolioLinktreeStack extends cdk.Stack {
       requestParameters: {
         'method.request.querystring.user': true,
         'method.request.querystring.linkId': true
-
       }
     })
 
@@ -335,7 +334,14 @@ export class PortfolioLinktreeStack extends cdk.Stack {
       },
       cloudFrontDistributionProps: {
         certificate: reactCert,
-        domainNames: [subdomain]
+        domainNames: [subdomain],
+        errorResponses: [
+          {
+            httpStatus: 403,
+            responseHttpStatus: 200,
+            responsePagePath: '/'
+          }
+        ]
       },
       logS3AccessLogs: false,
       insertHttpSecurityHeaders: false
