@@ -7,5 +7,3 @@ node_modules
 .cdk.staging
 cdk.out
 .~lock*
-# To protect AWS account ID
-portfolio-linktree.ts
