@@ -1,42 +1,61 @@
-import { Skeleton } from "@chakra-ui/react";
-import useLinks from "../hooks/useLinks";
-import { AmplifyUser } from "@aws-amplify/ui";
+import { Skeleton, VStack } from "@chakra-ui/react";
 import LinkCard from "./LinkCard";
 import { useParams } from "react-router-dom";
-
-// interface LinksListProps {
-//   user: AmplifyUser;
-// }
+import { useEffect, useState } from "react";
+import { Link } from "../services/links-service";
 
 const LinksList = () => {
-  const {user} = useParams();
-  const { links, error, isLoading, setLinks, setError } = useLinks(user as string);
+  const { user } = useParams();
+  // const { links, error, isLoading, setLinks, setError } = useLinks(user);
+  const [isLoading, setLoading] = useState(false);
+  const [links, setLinks] = useState<Link[] | []>([]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchLinks();
+  }, []);
+
+  const fetchLinks = () => {
+    // Inbuilt fetch is fine for getting the links
+    fetch(`https://api.linktree.portfolio.mannyserrano.com/links?user=${user}`)
+      .then((response) => {
+        return response.json() as Promise<{ links: Link[] }>;
+      })
+      .then((data) => {
+        setLinks(data.links);
+        setLoading(false);
+      });
+  };
 
   if (isLoading) {
     return (
       <>
-        <Skeleton></Skeleton>
-        <Skeleton></Skeleton>
-        <Skeleton></Skeleton>
-        <Skeleton></Skeleton>
+        <VStack>
+          <Skeleton height="50px" />
+          <Skeleton height="50px" />
+          <Skeleton height="50px" />
+          <Skeleton height="50px" />
+        </VStack>
       </>
     );
   }
 
   return (
     <>
-      {links &&
-        links.map((link) => {
-          return (
-            <LinkCard
-              displayText={link.displayText}
-              linkId={link.linkId}
-              isExplicit={link.isExplicit}
-              key={link.url}
-              user={user as string}
-            ></LinkCard>
-          );
-        })}
+      <VStack spacing={4}>
+        {links &&
+          links.map((link) => {
+            return (
+              <LinkCard
+                displayText={link.displayText}
+                linkId={link.linkId}
+                isExplicit={link.isExplicit}
+                key={link.linkId}
+                user={user as string}
+              ></LinkCard>
+            );
+          })}
+      </VStack>
     </>
   );
 };
