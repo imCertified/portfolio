@@ -3,19 +3,19 @@ import { AmplifyUser } from '@aws-amplify/ui';
 
 class HttpService {
   endpoint: string;
-  user: AmplifyUser;
+  user: string;
 
-  constructor(endpoint: string, user: AmplifyUser) {
+  constructor(endpoint: string, user: string) {
     this.endpoint = endpoint;
     this.user = user;
   }
 
-  getLinks<T>(treeId: string) {
+  getLinks<T>(user: string) {
     const controller = new AbortController();
 
     const request = apiClient.get<T>(this.endpoint, {
       params: {
-        user: treeId
+        user: user
       },
       // headers: {
       //   Authorization: this.user.getSignInUserSession()?.getIdToken().getJwtToken()
@@ -38,6 +38,6 @@ class HttpService {
   // }
 }
 
-const create = (endpoint: string, user: AmplifyUser) => new HttpService(endpoint, user);
+const create = (endpoint: string, user: string) => new HttpService(endpoint, user);
 
 export default create;

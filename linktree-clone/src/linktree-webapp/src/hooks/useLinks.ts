@@ -10,7 +10,7 @@ interface LinksList {
 
 
 
-const useLinks = (user: AmplifyUser) => {
+const useLinks = (user: string) => {
   const [links, setLinks] = useState<Link[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ const useLinks = (user: AmplifyUser) => {
 
   useEffect(() => {
     setLoading(true);
-    const { request, cancel } = linksService.getLinks<LinksList>('manny');
+    const { request, cancel } = linksService.getLinks<LinksList>(user);
     request
       .then((res) => {
         setLinks(res.data.links);
