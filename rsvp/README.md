@@ -1,4 +1,4 @@
-:warning: To see a live version of this project, click [here](https://linktree.portfolio.mannyserrano.com/katyperry) or [here]() or [here]().
+:warning: To see a live version of this project, click [here]() or [here]() or [here]().
 
 # tl;dr
 I built a basic webapp and backend that allows invitees to an event (in this case a wedding) to RSVP by scanning a personalized QR code attached to a physical invite or email. It uses React, API Gateway, Lambda, and DynamoDB all deployed by CDK. You can interact with a few examples at the links above. 
