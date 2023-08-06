@@ -1,0 +1,8 @@
+# Don't need local vscode settings
+*.vscode/*
+*cdk.context.*
+*cdk.out/*
+cdk.out/
+dist/
+node_modules/
+.~lock*
