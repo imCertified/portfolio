@@ -51,7 +51,7 @@ export class PortfolioLinktreeStack extends cdk.Stack {
       },
       projectionType: ddb.ProjectionType.INCLUDE,
       nonKeyAttributes: [
-        'clickTime'
+        'click_time'
       ]
     })
     
