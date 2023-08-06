@@ -1,4 +1,16 @@
-import { Button, Avatar, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Avatar,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+} from "@chakra-ui/react";
+import { useState } from "react";
 
 interface LinkCardProps {
   displayText: string;
@@ -8,8 +20,32 @@ interface LinkCardProps {
 }
 
 const LinkCard = ({ displayText, linkId, isExplicit, user }: LinkCardProps) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const openLink = () => {
+    window.open(
+      `https://api.linktree.portfolio.mannyserrano.com/redirect?user=${user}&linkId=${linkId}`,
+      "_blank"
+    );
+    setShowModal(false);
+  }
+
   return (
     <>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Explicit Link</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>This link has been marked as explicit. Do you want to continue?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='blue' onClick={openLink}>Continue</Button>
+            <Button variant='ghost' onClick={() => setShowModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       {/* Width should eventually be bound to the container size */}
       <Button
         bg="red"
@@ -19,12 +55,10 @@ const LinkCard = ({ displayText, linkId, isExplicit, user }: LinkCardProps) => {
         justifyContent={"space-between"}
         onClick={() => {
           if (isExplicit) {
-            alert("Explicit. Should be modal");
+            setShowModal(true);
+          } else {
+            openLink();
           }
-          window.open(
-            `https://api.linktree.portfolio.mannyserrano.com/redirect?user=${user}&linkId=${linkId}`,
-            "_blank"
-          );
         }}
       >
         <Avatar
