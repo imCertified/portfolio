@@ -307,7 +307,7 @@ export class PortfolioLinktreeStack extends cdk.Stack {
     linkProxyPath.addCorsPreflight({
       allowOrigins: ['*'],
       allowHeaders: ['*'],
-      allowMethods: ['GET']
+      allowMethods: ['DELETE']
     });
     linkProxyPath.addMethod('DELETE', new apigw.LambdaIntegration(deleteLinkFunction), {
       authorizer: cognitoAuthorizer

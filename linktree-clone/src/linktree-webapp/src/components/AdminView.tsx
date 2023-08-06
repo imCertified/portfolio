@@ -8,7 +8,7 @@ interface AdminViewProps {
 
 const AdminView = ({ user }: AdminViewProps) => {
   return (
-    <LinksList isOwned={true} user={user.username as string}></LinksList>
+    <LinksList user={user.username as string} isOwned={true} amplifyUser={user}></LinksList>
   )
 }
 
