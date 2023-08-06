@@ -21,7 +21,6 @@ export class PortfolioLinktreeStack extends cdk.Stack {
     const parentDomain = 'portfolio.mannyserrano.com';
     const subdomain = `linktree.${parentDomain}`
     const apiDomain = `api.${subdomain}`
-    const authDomain = `auth.${subdomain}`
 
     const portfolioHostedZone = r53.HostedZone.fromLookup(this, 'PorfolioHostedZone', {
       domainName: parentDomain
@@ -128,7 +127,7 @@ export class PortfolioLinktreeStack extends cdk.Stack {
               ],
               resources: [
                 table.tableArn,
-                `${table.tableArn}/index/*`
+                `${table.tableArn}/index/ClickIndex`
               ]
             })
           ]
@@ -162,7 +161,7 @@ export class PortfolioLinktreeStack extends cdk.Stack {
               },
               resources: [
                 table.tableArn,
-                `${table.tableArn}/index/*`
+                `${table.tableArn}/index/ClickIndex`
               ]
             })
           ]

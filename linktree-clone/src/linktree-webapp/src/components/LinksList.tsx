@@ -4,9 +4,12 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "../services/links-service";
 
-const LinksList = () => {
-  const { user } = useParams();
-  // const { links, error, isLoading, setLinks, setError } = useLinks(user);
+interface LinksListProps {
+  user: string;
+  isOwned: boolean;
+}
+
+const LinksList = ({ user, isOwned }: LinksListProps) => {
   const [isLoading, setLoading] = useState(false);
   const [links, setLinks] = useState<Link[] | []>([]);
 

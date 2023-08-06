@@ -7,6 +7,8 @@ import LinksList from "./components/LinksList";
 import config from "./amplifyConfig";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Text } from "@chakra-ui/react";
+import AdminView from "./components/AdminView";
+import AnonymousView from "./components/AnonymousView";
 
 // TODO: Inject these at build time
 Amplify.configure(config);
@@ -36,6 +38,7 @@ function App() {
         >
           {({ signOut, user }) => (
             <>
+            <AdminView user={user as AmplifyUser}></AdminView>
             <Text>Standin for {user?.username}</Text>
             <Button onClick={signOut}>Signout</Button>
             </>
@@ -43,7 +46,7 @@ function App() {
         </Authenticator>
       } />
       <Route path=':user' element={
-        <LinksList></LinksList>
+        <AnonymousView></AnonymousView>
       } />
       
     </Routes>
