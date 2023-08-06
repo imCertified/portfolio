@@ -15,18 +15,20 @@ import { useState } from "react";
 interface LinkCardProps {
   displayText: string;
   linkId: string;
+  url: string
   isExplicit: boolean;
   user: string;
 }
 
-const LinkCard = ({ displayText, linkId, isExplicit, user }: LinkCardProps) => {
+const LinkCard = ({ displayText, linkId, url, isExplicit, user }: LinkCardProps) => {
   const [showModal, setShowModal] = useState(false);
 
   const openLink = () => {
-    window.open(
-      `https://api.linktree.portfolio.mannyserrano.com/redirect?user=${user}&linkId=${linkId}`,
-      "_blank"
-    );
+    // Best effort to track link clicks without interfering with user flow
+    fetch(`https://api.linktree.portfolio.mannyserrano.com/track?user=${user}&linkId=${linkId}`, {
+      method: 'POST'
+    })
+    window.open(url, '_blank');
     setShowModal(false);
   }
 
@@ -41,7 +43,7 @@ const LinkCard = ({ displayText, linkId, isExplicit, user }: LinkCardProps) => {
             <Text>This link has been marked as explicit. Do you want to continue?</Text>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' onClick={openLink}>Continue</Button>
+            <Button colorScheme='red' onClick={openLink}>Continue</Button>
             <Button variant='ghost' onClick={() => setShowModal(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>

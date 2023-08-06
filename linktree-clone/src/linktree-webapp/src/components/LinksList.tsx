@@ -30,11 +30,11 @@ const LinksList = () => {
   if (isLoading) {
     return (
       <>
-        <VStack>
-          <Skeleton height="50px" />
-          <Skeleton height="50px" />
-          <Skeleton height="50px" />
-          <Skeleton height="50px" />
+        <VStack spacing={4}>
+          <Skeleton height="55px" />
+          <Skeleton height="55px" />
+          <Skeleton height="55px" />
+          <Skeleton height="55px" />
         </VStack>
       </>
     );
@@ -50,6 +50,7 @@ const LinksList = () => {
                 displayText={link.displayText}
                 linkId={link.linkId}
                 isExplicit={link.isExplicit}
+                url={link.url}
                 key={link.linkId}
                 user={user as string}
               ></LinkCard>

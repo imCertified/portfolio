@@ -124,7 +124,7 @@ export class PortfolioLinktreeStack extends cdk.Stack {
               effect: iam.Effect.ALLOW,
               actions: [
                 'dynamodb:Query',
-                'dynamodb:GetItem',
+                'dynamodb:GetItem'
               ],
               resources: [
                 table.tableArn,
@@ -150,7 +150,8 @@ export class PortfolioLinktreeStack extends cdk.Stack {
                 'dynamodb:UpdateItem',
                 'dynamodb:GetItem',
                 'dynamodb:Query',
-                'dynamodb:DeleteItem'
+                'dynamodb:DeleteItem',
+                'dynamodb:ConditionCheckItem'
               ],
               conditions: {
                 'ForAllValues:StringEquals': {
@@ -224,10 +225,10 @@ export class PortfolioLinktreeStack extends cdk.Stack {
     });
 
     // REDIRECT //
-    const redirectFunction = new pythonLda.PythonFunction(this, 'RedirectFunction', {
-      functionName: 'LinktreeRedirect',
+    const trackFunction = new pythonLda.PythonFunction(this, 'RedirectFunction', {
+      functionName: 'LinktreeTrackClicks',
       role: lambdaExecutionRole,
-      entry: 'lib/lambda/redirect',
+      entry: 'lib/lambda/click_tracker',
       layers: [utilityLayer, domainLayer],
       index: 'app.py',
       runtime: lda.Runtime.PYTHON_3_10,
@@ -313,8 +314,8 @@ export class PortfolioLinktreeStack extends cdk.Stack {
       authorizer: cognitoAuthorizer
     });
 
-    const redirectPath = api.root.addResource('redirect');
-    redirectPath.addMethod('GET', new apigw.LambdaIntegration(redirectFunction), {
+    const trackPath = api.root.addResource('track');
+    trackPath.addMethod('POST', new apigw.LambdaIntegration(trackFunction), {
       requestParameters: {
         'method.request.querystring.user': true,
         'method.request.querystring.linkId': true

@@ -109,6 +109,6 @@ class Link:
         return {  # Do not return URL so that it can be harvested
             'linkId': self.link_id,
             'displayText': self.display_text,
-            'isExplicit': self.is_explicit
+            'isExplicit': self.is_explicit,
+            'url': self.url
         }
-        

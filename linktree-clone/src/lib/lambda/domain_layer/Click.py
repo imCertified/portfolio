@@ -1,6 +1,7 @@
 from botocore.exceptions import ClientError
 from ulid import ULID
 from datetime import datetime
+from boto3.dynamodb.conditions import Key
 
     
 
@@ -25,6 +26,7 @@ class Click:
             username (str): The username to which the link belongs
             link_id (str): The friendly name (ID) of the tree to which this link should belong
         '''
+        print(f'Creating new click event for {username} and link ID {link_id}')
         click_time = datetime.now().isoformat()
         click_id = str(ULID())
         return cls(
@@ -54,18 +56,29 @@ class Click:
 
     def create_in_table(self, table):
         '''
-        Creates a Click in the given table. Raises UnownedTreeException if Tree is not owned
+        Creates a Click in the given table.
 
         Parameters:
             table: The boto3 DynamoDB Table object
         '''
 
-        table.put_item(
-            Item={
+        try:
+            table.put_item(
+                Item={
+                    **self.get_key(),
+                    'click_time': self.click_time,
+                    'gsi1pk': f'LINK#{self.link_id}'
+                },
+                # ConditionExpression=Key('pk').eq(self.username)  # Create only if that owner exists
+            )
+        except Exception as e:
+            print('Got error that we\'re going to ignore')
+            print(e)
+            print({
                 **self.get_key(),
                 'click_time': self.click_time
-            }
-        )
+            })
+            pass
 
     def get_key(self):
         return {
@@ -79,4 +92,3 @@ class Click:
             'linkId': self.link_id,
             'clickTime': self.click_time
         }
-        
