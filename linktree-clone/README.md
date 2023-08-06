@@ -54,7 +54,7 @@ __React will be used for the UI__
 1. AWS Amplify has some React components that I can use for handling the signup/signin flow with Cognito _without_ redirecting users to the very ugly Cognito hosted UI
 
 __DynamoDB will be used for state persistence__  
-1. DynamoDB is cool :callme:
+1. DynamoDB is cool :call_me_hand:
 1. DynamoDB can be configured such that it has no RCU/WCU cost at idle with on-demand capacity provisioning. Aurora serverless can only do this in v1, and I don't like managing SQL connection cursors anyway
 1. I'm ultra-familiar with data modeling on DynamoDB from some other projects
 1. The data I'm storing, while relational, does not require any complex joins or business logic on the database
