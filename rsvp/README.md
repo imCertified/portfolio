@@ -1,7 +1,7 @@
 :warning: To see a live version of this project, click [here]() or [here]() or [here]().
 
 # tl;dr
-I built a basic webapp and backend that allows invitees to an event (in this case a wedding) to RSVP by scanning a personalized QR code attached to a physical invite or email. It uses React, API Gateway, Lambda, and DynamoDB all deployed by CDK. You can interact with a few examples at the links above. 
+I built a webapp and backend that allows invitees to an event (in this case a wedding) to RSVP by scanning a personalized QR code attached to a physical invite or email. It uses React, API Gateway, Lambda, and DynamoDB all deployed by CDK. You can interact with a few examples at the links above. 
 
 # Introduction
 This project is an example of a basic RSVP website. However, as opposed to most RSVP solutions, the webapp is personalized for each person. Each invitee gets a unique URL that they can visit to RSVP. That URL can be disseminated to each invitee in whatever way the organizer chooses. I used this actual solution for my own wedding. We had generic invites printed with about 2 inches of blank space right in the center. Once we received the invites, we printed a QR code that mapped to each invitees URL for each invite on transparent stickers. Once each invitee received their invite, they scanned their QR code, answered the questions, and never had to text or call anyone throughout the process. Easy! We used stickers on physical invites, but this basic premise applies to any medium that can disseminate a URL directly or indirectly. The solution is also able to integrate very well with other existing event-based services like invite printing, invite mailing, etc. I didn't build any of that, because I didn't need it.
@@ -9,8 +9,8 @@ This project is an example of a basic RSVP website. However, as opposed to most 
 # Implementation
 ## Requirements
 There were a few basic requirements I wanted to hit when I was originally building this for my own wedding, and here they are:
-1. Each invitee's ability to add plus ones should be configurable per invitee
-1. Each invitee's landing page should prominently display their name and the current state of their invitation
+1. Each invitee's ability to add plus ones should be configurable _per invitee_
+1. Each invitee's landing page should prominently display their name and the current state of their invitation (attending, plus one, food choice, etc)
 1. Invitees should be able to specify dietary restrictions on the RSVP
 1. Invitees should be able to choose from the available meal options
 1. Invitees should be able to specify the age group of their plus ones (child, non-drinking age adult, drinking-age adult)
@@ -23,10 +23,10 @@ There were a few basic requirements I wanted to hit when I was originally buildi
     1. Retrieve a CSV file detailing each invitee, their attending status, their requested meal, and dietary restrictions
 
 ## Architecture
-My RSVP solution is a 3-tier serverless solution with a static webapp for the UI (React), API layer (API Gateway and Lambda) and a persistence layer (DynamoDB). There is no authentication needed for the invitees, and write authorization is handled exclusively by IAM. CloudFront is used to distribute the webapp, while an edge-optimized API Gateway endpoint is used to make the API available. There is no caching needed aside from the webapp as the data is unique to each person and should only be access once or twice throughout the life of an RSVP. 
+My RSVP solution is a 3-tier serverless solution with a static webapp for the UI (React), API layer (API Gateway and Lambda), and a persistence layer (DynamoDB). There is no authentication needed for the invitees, and write authorization is handled exclusively by IAM. CloudFront is used to distribute the webapp, while an edge-optimized API Gateway endpoint is used to make the API available. There is no caching needed aside from the webapp as the data is unique to each person and should only be access once or twice throughout the life of an RSVP. 
 
 ## Data Model - UPDATE!!!!
-The data model is probably the simplest part of this implementation due to the nature of the data to persist and the very lax security requirements. The data model uses the a composite key where the primary (hash) key is the invite ID unique to that invite and the sort (range) key consists of an entity type and another identifier. The different entity types are Invite, Invitee, and PlusOne. Invite objects stores metadata about the invite. Invitee objects store information about each specifically-invited person. PlusOne objects store information about each plus one that the invitee adds.
+The data model is probably the simplest part of this implementation due to the nature of the data to persist and the very lax security requirements. The data model uses the a composite key where the primary (hash) key is the invite ID unique to that invite and the sort (range) key consists of an entity type and another identifier. The different entity types are Invite, Invitee, and PlusOne. Invite objects store metadata about the invite. Invitee objects store information about each specifically-invited person. PlusOne objects store information about each plus one that the invitee adds.
 
 An example Invite item is shown below. Note the `INVITE#` prefix in the `sk` attribute.
 <img src='assets/example-invite.PNG' alt='Example Invite Object'><br /><br />
@@ -37,12 +37,12 @@ An example Invite item is shown below. Note the `INVITEE#` prefix in the `sk` at
 Finally, an example PlusOne item is shown below. Note the `PO#` prefix in the `sk` attribute.
 <img src='assets/example-plusone.PNG' alt='Example Plus One Object'><br /><br />
 
-The prefix for each entity type allows for the DynamoDB data model to be dynamic. That is, it allows us to store different entity types alongside each other within the same primary key. Being within the same primary key associates them to a specific invite, and allows me to use the DynamoDB engine to my advantage. I strongly recommend a bit of research on data modelling in DynamoDB if this is foreign to you. DynamoDB is one of the most impressive services on AWS in my opinion, and that's due in no small part to the wonderfully fun world of data modelling for the service.
+The prefix for each entity type allows for the DynamoDB data model to be dynamic. That is, it allows us to store different entity types alongside each other within the same primary key. Being within the same primary key associates them to a specific invite, and allows me to use the DynamoDB engine to my advantage. I strongly recommend a bit of research on data modelling in DynamoDB if this is foreign to you. DynamoDB is one of the most impressive services on AWS in my opinion, and that's due in no small part to the wonderfully fun world of data modelling for the service.<br /><br />
 
 Note also that there are no indexes here. There is no need for any data associations except from each entity to its invite, which is already handled by the key structure and the entity prefixes.
 
 # Deployment
-The project is a TypeScript CDK project defined entirely within the `src/` directory. I've implemented a semi-custom CDK construct to handle the build and deployment of the React application into the hosting bucket during a CDK deployment. You can find the source to the webapp in `src/rsvp-webapp`. Please note again that I am not a frontend developer.
+The project is a TypeScript CDK project defined entirely within the `src/` directory. I've implemented a semi-custom CDK construct to handle the build and deployment of the React application into the hosting bucket during a CDK deployment. You can find the source to the webapp in `src/rsvp-webapp` in addition to deployed versions at the links at the top of this README. Please note again that I am not a frontend developer.
 
 # Design Decision Log
 All good projects have a decision log. Here is mine.<br /><br />
