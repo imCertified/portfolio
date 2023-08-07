@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  AssumptionTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: AssumptionTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      LocalSecondaryIndexes:
+        - IndexName: TimeSeriesIndex
+          KeySchema:
+            - AttributeName: pk
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+  
+  # Access role. Heavy lifting role. Actually allows access to the tenant-specific data in DDB
+  ExampleAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !GetAtt ExampleServiceRole.Arn
+            Action: "sts:AssumeRole"
+          - Effect: Allow
+            Principal:
+              AWS: !GetAtt ExampleServiceRole.Arn
+            Action: "sts:TagSession"
+            Condition:
+              StringLike:
+                aws:RequestTag/TenantID: "*"  # Dictates that  a tenant ID must be specified, but the * allows any value to be specified
+      Policies:
+        - PolicyName: AccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:GetItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:PutItem"
+                Resource:
+                  - !GetAtt AssumptionTable.Arn
+                  - !Sub ${AssumptionTable.Arn}/index/*
+                Condition:
+                  ForAllValues:StringEquals:
+                    dynamodb:LeadingKeys:
+                      - "${aws:PrincipalTag/TenantID}"  # Scopes policies to a specific tenant ID
+  
+  ExampleServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+              
+  ExampleAssumptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: assumption_function/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt ExampleServiceRole.Arn
+      MemorySize: 1024
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          ACCESS_ROLE_ARN: !GetAtt ExampleAccessRole.Arn
+          ASSUMPTION_TABLE_NAME: AssumptionTable

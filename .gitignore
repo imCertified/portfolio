@@ -6,3 +6,5 @@ cdk.out/
 dist/
 node_modules/
 .~lock*
+samconfig.toml
+.aws-sam/
