@@ -25,7 +25,7 @@ There were a few basic requirements I wanted to hit when I was originally buildi
 ## Architecture
 My RSVP solution is a 3-tier serverless solution with a static webapp for the UI (React), API layer (API Gateway and Lambda) and a persistence layer (DynamoDB). There is no authentication needed for the invitees, and write authorization is handled exclusively by IAM. CloudFront is used to distribute the webapp, while an edge-optimized API Gateway endpoint is used to make the API available. There is no caching needed aside from the webapp as the data is unique to each person and should only be access once or twice throughout the life of an RSVP. 
 
-## Data Model
+## Data Model - UPDATE!!!!
 The data model is probably the simplest part of this implementation due to the nature of the data to persist and the very lax security requirements. The data model uses the a composite key where the primary (hash) key is the invite ID unique to that invite and the sort (range) key consists of an entity type and another identifier. The different entity types are Invite, Invitee, and PlusOne. Invite objects stores metadata about the invite. Invitee objects store information about each specifically-invited person. PlusOne objects store information about each plus one that the invitee adds.
 
 An example Invite item is shown below. Note the `INVITE#` prefix in the `sk` attribute.
