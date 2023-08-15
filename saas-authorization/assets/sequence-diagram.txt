@@ -1,0 +1,10 @@
+title SaaS Assumption Sequence Diagram
+
+User->Lambda:Make Request
+Lambda->IAM/STS: AssumeRole w/ Tenant ID
+IAM/STS->Lambda: Temporary Scoped Credentials
+Lambda->DynamoDB: GetItem
+DynamoDB->IAM/STS: Verify Access
+IAM/STS->DynamoDB: Granted
+DynamoDB->Lambda: Item
+Lambda->User: Requested Item

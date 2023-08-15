@@ -7,3 +7,5 @@ dist/
 node_modules/
 .~lock*
 __pycache__
+samconfig.toml
+.aws-sam/
