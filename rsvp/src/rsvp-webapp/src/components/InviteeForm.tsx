@@ -25,7 +25,7 @@ const InviteeForm = ({
 
   return (
     <>
-      <Container w="500px">
+      <Container w='100vw'>
         {invitee.name}
         <RadioGroup
           onChange={(e) => onAttendingChange(e === "true" ? true : false)}

@@ -1,5 +1,5 @@
 import RSVPForm from "./components/RSVPForm";
-import { Center, Flex } from "@chakra-ui/react";
+import { AbsoluteCenter, Flex } from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -10,14 +10,14 @@ function App() {
           {/* Only one route that captures the invite ID */}
           <Route path=':inviteId' element={
             <Flex
-              width={"100vw"}
-              height={"100vh"}
+              width="100vw"
+              height="100vh"
               alignContent={"center"}
               justifyContent={"center"}
             >
-              <Center>
+              <AbsoluteCenter>
                 <RSVPForm></RSVPForm>
-              </Center>
+              </AbsoluteCenter>
             </Flex>
             } />
         </Routes>

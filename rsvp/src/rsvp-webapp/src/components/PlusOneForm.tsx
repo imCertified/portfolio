@@ -30,7 +30,7 @@ const PlusOneForm = ({
 }: PlusOneFormProps) => {
   return (
     <>
-      <Container w="500px">
+      <Container w='100vw'>
         <Grid templateColumns="5fr 1fr">
           <GridItem>
             <Input
