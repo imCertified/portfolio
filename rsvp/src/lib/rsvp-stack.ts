@@ -1,4 +1,4 @@
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import * as r53 from 'aws-cdk-lib/aws-route53';
 import * as ddb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
@@ -25,6 +25,7 @@ export class RSVPStack extends Stack {
 
     const table = new ddb.Table(this, 'RSVPTable', {
       tableName: 'RSVPTable',
+      removalPolicy: RemovalPolicy.DESTROY,
       partitionKey: {
         name: 'pk',
         type: ddb.AttributeType.STRING
@@ -32,9 +33,9 @@ export class RSVPStack extends Stack {
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
     });
 
-    const inviteLayer = new pythonLda.PythonLayerVersion(this, 'InviteLayer', {
-      layerVersionName: 'RSVPInviteLayer',
-      entry: 'lib/lambda/invite_layer',
+    const domainLayer = new pythonLda.PythonLayerVersion(this, 'DomainLayer', {
+      layerVersionName: 'RSVPDomainLayer',
+      entry: 'lib/lambda/domain_layer',
       compatibleArchitectures: [lda.Architecture.X86_64],
       compatibleRuntimes: [lda.Runtime.PYTHON_3_9]
     })
@@ -49,7 +50,7 @@ export class RSVPStack extends Stack {
       environment: {
         'TABLE_NAME': table.tableName
       },
-      layers: [inviteLayer]
+      layers: [domainLayer]
     })
     table.grantReadData(getInviteFunction);
 
@@ -63,9 +64,9 @@ export class RSVPStack extends Stack {
       environment: {
         'TABLE_NAME': table.tableName
       },
-      layers: [inviteLayer]
+      layers: [domainLayer]
     })
-    table.grantWriteData(respondInviteFunction);
+    table.grantReadWriteData(respondInviteFunction);
 
     const apiCert = new acm.Certificate(this, 'APICertificate',
     {
