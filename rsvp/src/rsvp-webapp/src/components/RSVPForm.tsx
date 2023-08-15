@@ -178,6 +178,12 @@ const RSVPForm = () => {
     }
 
     delete newInvite.plusOnes[index];
+
+    // Remove null references as a result of deleting plus Ones
+    newInvite.plusOnes = newInvite.plusOnes.filter(plusOne => {
+      return plusOne != null
+    })
+
     setInvite(newInvite);
   }
 

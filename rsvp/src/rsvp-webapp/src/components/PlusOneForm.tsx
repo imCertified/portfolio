@@ -1,6 +1,5 @@
 import {
   Center,
-  AbsoluteCenter,
   Container,
   Grid,
   GridItem,
@@ -71,9 +70,7 @@ const PlusOneForm = ({
           </GridItem>
           <GridItem>
             <Center>
-            <AbsoluteCenter axis='vertical'>
               <IconButton onClick={onDelete} size="sm" isRound={true} aria-label="Delete Plus One" icon={<IoMdClose />} />
-            </AbsoluteCenter>
             </Center>
           </GridItem>
         </Grid>
