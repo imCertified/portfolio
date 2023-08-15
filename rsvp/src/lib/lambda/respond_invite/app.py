@@ -12,18 +12,13 @@ def lambda_handler(event, context):
 
     body = json.loads(event['body'])
     invite_id = event['pathParameters']['inviteId']
-    attending = body['attending']
-    plus_one = body['plusOne']
-    print(f'{invite_id=}')
-    print(f'{attending=}')
-    print(f'{plus_one=}')
 
+    # TODO: Need request model
     try:
         Invite.respond(
-            table=table,
-            invite_id=invite_id,
-            attending=attending,
-            plus_one=plus_one
+            table,
+            invite_id,
+            body
         )
     except ValueError:
         return {

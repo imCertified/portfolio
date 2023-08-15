@@ -7,6 +7,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          {/* Only one route that captures the invite ID */}
           <Route path=':inviteId' element={
             <Flex
               width={"100vw"}

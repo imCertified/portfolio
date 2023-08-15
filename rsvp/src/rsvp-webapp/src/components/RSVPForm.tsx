@@ -1,120 +1,293 @@
-import React, { useState, useEffect } from "react";
-import {
-  FormControl,
-  Button,
-  Stack,
-  Skeleton,
-  VStack,
-  RadioGroup,
-  Radio,
-  Checkbox,
-  Text,
-  HStack
-} from "@chakra-ui/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Spinner, VStack, Text, Button, IconButton } from "@chakra-ui/react";
+import InviteeForm from "./InviteeForm";
+import { Invite, Invitee } from "../services/inviteService";
+import PlusOneForm from "./PlusOneForm";
+import { BsPlusLg } from 'react-icons/bs'
+
+const API_DOMAIN = import.meta.env.VITE_API_DOMAIN; // Pull API location from dotenv config file
+
+// Method to decipher whether update is to plusOne or invitee in handle methods
+enum UpdateType {
+  Invitee,
+  PlusOne,
+}
 
 const RSVPForm = () => {
-  const {inviteId} = useParams();
-  const [isLoading, setLoading] = useState(false);
-  const [isSubmitting, setSubmitting] = useState(false);
-  const [isSubmitted, setSubmitted] = useState(false);
-  const [invite, setInvite] = useState({
-    inviteeName: '',
-    attending: '',
-    plusOne: false,
-    allowPlusOne: null
+  const { inviteId } = useParams();
+  const [invite, setInvite] = useState<Invite>({
+    invitees: [
+      {
+        name: "",
+        attending: false,
+        foodSelection: "",
+        dietaryRestrictions: "",
+      },
+    ],
+    plusOnes: [
+      {
+        name: "",
+        foodSelection: "",
+        dietaryRestrictions: "",
+        ageGroup: "",
+      }
+    ],
+    allowedPlusOnes: 0
   });
+  const [isSubmitted, setSubmitted] = useState(false);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
+  // Fetch the invite on first page load
   useEffect(() => {
     setLoading(true);
-    fetchInvite();
+    axios.get(`${API_DOMAIN}/invite/${inviteId}`).then((response) => {
+      setLoading(false);
+      setInvite(response.data);
+    });
   }, []);
 
-  const handleAttendingChange = (isAttending: string) => {
-    setInvite({
+  const handleFoodSelectionUpdate = (
+    type: UpdateType,
+    updateIndex: number,
+    foodSelection: string
+  ) => {
+    let newInvite = {
       ...invite,
-      attending: isAttending,
-      plusOne: isAttending === 'false' ? false : invite.plusOne
-    });
-  };
+    };
 
-  const handlePlusOneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (invite.attending === 'true') {
-      setInvite({
-        ...invite,
-        plusOne: event.target.checked
+    // Update Invitee food selection
+    if (type === UpdateType.Invitee) {
+      newInvite.invitees = newInvite.invitees.map((invitee, index) => {
+        return {
+          ...invitee,
+          foodSelection:
+            index === updateIndex ? foodSelection : invitee.foodSelection,
+        };
+      });
+    } else if (type === UpdateType.PlusOne) {
+      newInvite.plusOnes = newInvite.plusOnes.map((plusOne, index) => {
+        return {
+          ...plusOne,
+          foodSelection:
+            index === updateIndex ? foodSelection : plusOne.foodSelection,
+        };
       });
     }
+
+    setInvite(newInvite);
   };
 
-  const fetchInvite = () => {
-    fetch(`https://api.rsvp.portfolio.mannyserrano.com/invite/${inviteId}`)
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        setInvite({
-          ...data,
-          attending: data.attending === true ? 'true' : 'false',
-          plusOne: data.attending === true ? data.plusOne : false
-        });
-        setLoading(false);
-      })
+  const handleDietaryRestrictionsUpdate = (
+    type: UpdateType,
+    updateIndex: number,
+    dietaryRestrictions: string
+  ) => {
+    let newInvite = {
+      ...invite,
+    };
+
+    // Update Invitee food selection
+    if (type === UpdateType.Invitee) {
+      newInvite.invitees = newInvite.invitees.map((invitee, index) => {
+        return {
+          ...invitee,
+          dietaryRestrictions: index === updateIndex ? dietaryRestrictions : invitee.dietaryRestrictions
+        };
+      });
+    } else if (type === UpdateType.PlusOne) {
+      newInvite.plusOnes = newInvite.plusOnes.map((plusOne, index) => {
+        return {
+          ...plusOne,
+          dietaryRestrictions: index === updateIndex ? dietaryRestrictions : plusOne.dietaryRestrictions
+        };
+      });
+    }
+
+    setInvite(newInvite);
+  };
+
+  const handleAttendingChange = (updateIndex:number, attending: boolean) => {
+    let newInvite = {
+      ...invite
+    }
+
+    newInvite.invitees = newInvite.invitees.map((invitee, index) => {
+      return {
+        ...invitee,
+        attending: index === updateIndex ? attending : invitee.attending
+      };
+    });
+
+    setInvite(newInvite);
   }
 
-  const sendRSVP = () => {
-    const payload = JSON.stringify({
-      ...invite,
-      attending: invite.attending === 'true' ? true : false
+  const handleNameChange = (updateIndex: number, name: string) => {
+    let newInvite = {
+      ...invite
+    }
+
+    newInvite.plusOnes = newInvite.plusOnes.map((plusOne, index) => {
+      return {
+        ...plusOne,
+        name: index === updateIndex ? name : plusOne.name
+      };
+    });
+
+    setInvite(newInvite);
+  }
+
+  const handleAgeGroupChange = (updateIndex: number, ageGroup: string) => {
+    let newInvite = {
+      ...invite
+    }
+
+    newInvite.plusOnes = newInvite.plusOnes.map((plusOne, index) => {
+      return {
+        ...plusOne,
+        ageGroup: index === updateIndex ? ageGroup : plusOne.ageGroup,
+        foodSelection: index === updateIndex ? ageGroup === 'child' ? 'Kid\'s Meal' : plusOne.foodSelection : plusOne.foodSelection
+      };
+    });
+
+    setInvite(newInvite);
+  }
+
+  const handleAddPlusOne = () => {
+    let newInvite = {
+      ...invite
+    }
+    
+    newInvite.plusOnes.push({
+      name: '',
+      ageGroup: 'child',
+      dietaryRestrictions: '',
+      foodSelection: 'Kid\'s Meal'
     })
 
+    newInvite.plusOnes = newInvite.plusOnes.slice(0, invite.allowedPlusOnes)
+
+    setInvite(newInvite);
+  }
+
+  const handleDeletePlusOne = (index: number) => {
+    let newInvite = {
+      ...invite
+    }
+
+    delete newInvite.plusOnes[index];
+    setInvite(newInvite);
+  }
+
+  const handleSubmit = () => {
+    console.log('Submitting');
+
+    const intermedInvite = {
+      ...invite
+    }
+
+    // Remove null references as a result of deleting plus Ones
+    intermedInvite.plusOnes = intermedInvite.plusOnes.filter(plusOne => {
+      return plusOne != null
+    })
+
+    const payload = JSON.stringify(intermedInvite);
+
     setSubmitting(true);
-    fetch(`https://api.rsvp.portfolio.mannyserrano.com/invite/${inviteId}`, {method: 'PUT', body: payload})
-      .then(response => {
-        if (response.status === 200) {
-          setSubmitting(false);
-          setSubmitted(true);
-        }
-        return response.json()
-      });
+    fetch(`https://api.rsvp.portfolio.mannyserrano.com/invite/${inviteId}`, {
+      method: "PUT",
+      body: payload,
+    }).then((response) => {
+      if (response.status === 200) {
+        setSubmitting(false);
+        setSubmitted(true);
+      }
+      return response.json();
+    });
   }
 
+  const atLeastOneAttending = (invitees: Invitee[]) => {
+    return invitees.some((invitee) => {
+      return invitee.attending === true
+    })
+  }
+
+  // Return a basic spinner if still loading
   if (isLoading) {
-    return (
-      <Stack spacing={3}>
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-      </Stack>
-    );
+    return <Spinner size="md" />;
   }
 
+  // Return thank you message if done submitting
   if (isSubmitted) {
-    return (
-      <Text>Your RSVP Has Been Received. Thank you!</Text>
-    )
+    return <Text>Your RSVP Has Been Received. Thank you!</Text>;
   }
 
   return (
     <>
-      <FormControl>
-        <VStack spacing={3}>
-        <Text fontSize='3xl'>{invite.inviteeName}</Text>
-          <RadioGroup onChange={handleAttendingChange} value={invite.attending}>
-            <HStack spacing={10}>
-              <Radio value='false' size='lg'>Not Attending</Radio>
-              <Radio value='true' size='lg'>Attending</Radio>
-            </HStack>
-          </RadioGroup>
-          {(invite.attending === 'true' && invite.allowPlusOne) && (
-            <Checkbox size='lg' isChecked={invite.plusOne} onChange={handlePlusOneChange}>Plus One</Checkbox>
-          )}
-          <Button isLoading={isSubmitting} onClick={sendRSVP} loadingText='Submitting' textColor='#92b4d7' background='whiteAlpha.200'>
-            Submit
-          </Button>
-        </VStack>
-      </FormControl>
+      <VStack spacing={8}>
+        {invite.invitees.map((invitee, index) => {
+          return (
+            <InviteeForm
+              invitee={invitee}
+              onFoodSelectionUpdate={(foodSelection: string) =>
+                handleFoodSelectionUpdate(
+                  UpdateType.Invitee,
+                  index,
+                  foodSelection
+                )
+              }
+              onDietaryRestrictionsChange={(dietaryRestrictions: string) => 
+                handleDietaryRestrictionsUpdate(
+                  UpdateType.Invitee,
+                  index,
+                  dietaryRestrictions
+                )
+              }
+              onAttendingChange={(attending: boolean) => 
+                handleAttendingChange(
+                  index,
+                  attending
+                )
+              }
+              key={index}
+            />
+          );
+        })}
+        {/* Don't show plus ones if none of the attendees are attending */}
+        {atLeastOneAttending(invite.invitees) && invite.plusOnes.map((plusOne, index) => {
+          return (
+            <PlusOneForm
+              plusOne={plusOne}
+              onFoodSelectionChange={(foodSelection: string) =>
+                handleFoodSelectionUpdate(
+                  UpdateType.PlusOne,
+                  index,
+                  foodSelection
+                )
+              }
+              onDietaryRestrictionsChange={(dietaryRestrictions: string) => 
+                handleDietaryRestrictionsUpdate(
+                  UpdateType.PlusOne,
+                  index,
+                  dietaryRestrictions
+                )
+              }
+              onNameChange={(name: string) => 
+                handleNameChange(index, name)
+              }
+              onAgeGroupChange={(ageGroup: string) =>
+                handleAgeGroupChange(index, ageGroup)           
+              }
+              onDelete={() => handleDeletePlusOne(index)}
+              key={index}
+            />
+          );
+        })}
+        {invite.plusOnes.length < invite.allowedPlusOnes && <IconButton aria-label="Add Plus One" icon={<BsPlusLg />} onClick={handleAddPlusOne} />}
+        <Button onClick={handleSubmit} isLoading={isSubmitting}>Submit</Button>
+      </VStack>
     </>
   );
 };
