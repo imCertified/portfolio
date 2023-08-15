@@ -1,4 +1,4 @@
-:warning: To see a live version of this project, click [here]() or [here]() or [here]()<br/ >
+:warning: To see a live version of this project, click [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQKXTNSVD1PEHDP1B7B7W) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJYFVF6SV69Q63AQKM4K) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJ5CXEG1DDGCBNPND438)<br/ >
 
 Or scan this!
 <img src='qr-code.png' alt='QR Code' />
@@ -28,21 +28,11 @@ There were a few basic requirements I wanted to hit when I was originally buildi
 ## Architecture
 My RSVP solution is a 3-tier serverless solution with a static webapp for the UI (React), API layer (API Gateway and Lambda), and a persistence layer (DynamoDB). There is no authentication needed for the invitees, and write authorization is handled exclusively by IAM. CloudFront is used to distribute the webapp, while an edge-optimized API Gateway endpoint is used to make the API available. There is no caching needed aside from the webapp as the data is unique to each person and should only be access once or twice throughout the life of an RSVP. 
 
-## Data Model - UPDATE!!!!
-The data model is probably the simplest part of this implementation due to the nature of the data to persist and the very lax security requirements. The data model uses the a composite key where the primary (hash) key is the invite ID unique to that invite and the sort (range) key consists of an entity type and another identifier. The different entity types are Invite, Invitee, and PlusOne. Invite objects store metadata about the invite. Invitee objects store information about each specifically-invited person. PlusOne objects store information about each plus one that the invitee adds.
-
-An example Invite item is shown below. Note the `INVITE#` prefix in the `sk` attribute.
+## Data Model
+The data model is probably the simplest part of this implementation due to the nature of the data to persist and the very lax security requirements. The data model has an individual entity type (the invite) with one item per invite. Each invite item has a list of invitees, a list of plusOnes, and allowedPlusOnes, which is the pre-configured number of plus ones allowed. Combining all entities into a single object makes the presentation logic on the webapp somewhat more complex, but allows for an overall simpler data model. I could just have easily split the data model into 3 entities (invite, invitee, and plus one), and handled them individually. I decided against that as none of the entities have any meaning unless combined with the others. All data manipulation happens in an "all-or-nothing" fashion as an RSVP only has _meaning_ when the entire context is considered. An example Invite item is shown below.<br />
 <img src='assets/example-invite.PNG' alt='Example Invite Object'><br /><br />
 
-An example Invite item is shown below. Note the `INVITEE#` prefix in the `sk` attribute.
-<img src='assets/example-invitee.PNG' alt='Example Invitee Object'><br /><br />
-
-Finally, an example PlusOne item is shown below. Note the `PO#` prefix in the `sk` attribute.
-<img src='assets/example-plusone.PNG' alt='Example Plus One Object'><br /><br />
-
-The prefix for each entity type allows for the DynamoDB data model to be dynamic. That is, it allows us to store different entity types alongside each other within the same primary key. Being within the same primary key associates them to a specific invite, and allows me to use the DynamoDB engine to my advantage. I strongly recommend a bit of research on data modelling in DynamoDB if this is foreign to you. DynamoDB is one of the most impressive services on AWS in my opinion, and that's due in no small part to the wonderfully fun world of data modelling for the service.<br /><br />
-
-Note also that there are no indexes here. There is no need for any data associations except from each entity to its invite, which is already handled by the key structure and the entity prefixes.
+Question: Why aren't there different entity types for each entity? i.e. one entity for an invitee, another entity for a plus one, etc? The answer is because the value of those entities have no value individually. If you think about the idea of an RSVP, you don't need to track entities along the way as the user adds them in the webapp. The value of the invitees and plus ones only exist once the user submits the RSVP in full. Storing them separately would simply add more round-trips to DynamoDB for each submission that is unnecesarry. None of the identified access patterns require the retrieval of one entity without the others, and the value of those entities only have value in context of each other. Therefore, there is no reason I've identified to split the entities into their own items. Rather, they all exist on the same item, and that's fine. Also, the code that handles the business logic for each of these entities can still be split by entity type and consolidated together into a larger Invite object while keeping the individual entity classes lean. See the [domain layer](./src/lib/lambda/domain_layer) to understand more about the classes and their relationships to each other.<br /><br />
 
 # Deployment
 The project is a TypeScript CDK project defined entirely within the `src/` directory. I've implemented a semi-custom CDK construct to handle the build and deployment of the React application into the hosting bucket during a CDK deployment. You can find the source to the webapp in `src/rsvp-webapp` in addition to deployed versions at the links at the top of this README. Please note again that I am not a frontend developer.
