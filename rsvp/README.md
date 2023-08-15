@@ -1,7 +1,7 @@
 :warning: To see a live version of this project, click [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQKXTNSVD1PEHDP1B7B7W) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJYFVF6SV69Q63AQKM4K) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJ5CXEG1DDGCBNPND438)<br />
 
-Or scan this!
-<img src='qr-code.png' alt='QR Code' />
+Or scan this with your mobile device's camera app!<br />
+<img src='assets/qr-code.PNG' alt='QR Code' width='300px'/>
 
 # tl;dr
 I built a webapp and backend that allows invitees to an event (in this case a wedding) to RSVP by scanning a personalized QR code attached to a physical invite or email. It uses React, API Gateway, Lambda, and DynamoDB all deployed by CDK. You can interact with a few examples at the links above. 
