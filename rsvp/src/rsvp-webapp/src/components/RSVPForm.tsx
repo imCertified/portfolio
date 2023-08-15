@@ -7,7 +7,7 @@ import { Invite, Invitee } from "../services/inviteService";
 import PlusOneForm from "./PlusOneForm";
 import { BsPlusLg } from 'react-icons/bs'
 
-const API_DOMAIN = import.meta.env.VITE_API_DOMAIN; // Pull API location from dotenv config file
+const API_DOMAIN = 'https://api.rsvp.portfolio.mannyserrano.com';
 
 // Method to decipher whether update is to plusOne or invitee in handle methods
 enum UpdateType {
