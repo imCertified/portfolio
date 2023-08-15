@@ -227,7 +227,7 @@ const RSVPForm = () => {
 
   // Return thank you message if done submitting
   if (isSubmitted) {
-    return <Text>Your RSVP Has Been Received. Thank you!</Text>;
+    return <Text>Your RSVP has been received. Thank you!</Text>;
   }
 
   return (
