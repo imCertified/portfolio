@@ -1,4 +1,4 @@
-:warning: To see a live version of this project, click [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQKXTNSVD1PEHDP1B7B7W) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJYFVF6SV69Q63AQKM4K) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJ5CXEG1DDGCBNPND438)<br />
+:warning: To see a live version of this project, click [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQKXTNSVD1PEHDP1B7B7W) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJYFVF6SV69Q63AQKM4K) or [here](https://rsvp.portfolio.mannyserrano.com/01H7BDQJ5CXEG1DDGCBNPND438). Note that this webapp is meant to be access exclusively through mobile devices.<br />
 
 Or scan this with your mobile device's camera app!<br />
 <img src='assets/qr-code.PNG' alt='QR Code' width='300px'/>
