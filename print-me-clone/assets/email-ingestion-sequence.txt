@@ -1,0 +1,15 @@
+title Email Ingestion
+
+# Establish actors
+actor User
+fontawesome f233 Email Server (SES)
+fontawesome f121 Email Parser
+fontawesome f1c0 Object Store
+fontawesome f1c0 Metadata Store
+
+User->Email Server (SES): Email w/ Document Attached
+Email Server (SES)->Email Parser: Raw Email Data
+Email Parser->Object Store: Store Document(s)
+Email Parser->Metadata Store: Track Document(s)
+Email Parser->Email Server (SES): Raw Response Data w/ Code
+Email Server (SES)->User: Pretty Email w/ Code

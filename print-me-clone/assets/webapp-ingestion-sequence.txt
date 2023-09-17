@@ -1,0 +1,31 @@
+title Webapp Ingestion
+
+# Establish actors
+actor User
+fontawesome f233 Web Server
+fontawesome f121 Job Status
+fontawesome f121 Upload Provider
+fontawesome f1c0 Object Store
+fontawesome f121 Upload Handler
+fontawesome f121 Job Status
+fontawesome f1c0 Metadata Store
+
+User->Web Server: Request Webapp
+Web Server->User: Static Webapp
+space 3
+User->Upload Provider: Get Upload URLs
+Upload Provider->User: Upload URLs
+User->Object Store: Store Document(s) w/ Metadata
+
+User->Job Status: Poll
+Job Status->User: Unprocessed
+
+space -7
+Object Store->Upload Handler: Upload Event
+activate Upload Handler
+Upload Handler->Metadata Store: Track Document(s)
+Upload Handler->Metadata Store: Set Status
+space 1
+deactivate Upload Handler
+User->Job Status: Poll
+Job Status->User: Code
