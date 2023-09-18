@@ -48,7 +48,7 @@ And here is an example of a Job entity stored in DynamoDB
 * pk - The hash key for the entire job. This hash key will be shared by the Job and all associated Documents as a way to optimize DDB engine storage and enable saas-authorization.
 * sk - The range key for a Job. In the case of a Job, the range key will be identical to the hash key.
 * friendly_name - The optional friendly name given to this print job by the user.
-* status - The print job's status. Valid values are PENDING, FAILED, and FULFILLED.
+* status - The print job's status. Valid values are FULFILLED, FAILED, and FULFILLED.
 * created_date - The datetime string in ISO-8601 format denoting when the Job was first created.
 * fulfilled_date - The datetime string in ISO-8601 format denoting when the Job was fulfilled via (simulated) printing.
 * ttl - Time-to-live attribute denoting when the Job will be destroyed by the DDB engine. Essentially this acts as an expiration date for the Job and keeps storage costs down and partitions lean. If a comprehensive audit log was needed for this app (which it's not), this could be omitted. This is stored as a Unix timestamp and is always set 7 days from the creationDate.

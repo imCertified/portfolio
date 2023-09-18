@@ -4,6 +4,8 @@ import { Construct } from 'constructs';
 import * as r53 from 'aws-cdk-lib/aws-route53';
 import * as ddb from 'aws-cdk-lib/aws-dynamodb';
 import * as lda from 'aws-cdk-lib/aws-lambda';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as pythonLda from '@aws-cdk/aws-lambda-python-alpha';
 
 export class PrintMeStack extends cdk.Stack {
@@ -34,8 +36,15 @@ export class PrintMeStack extends cdk.Stack {
     });
 
     const domainLayer = new pythonLda.PythonLayerVersion(this, 'DomainLayer', {
-      layerVersionName: 'RSVPDomainLayer',
+      layerVersionName: 'PrintMeDomainLayer',
       entry: 'lib/lambda/domain_layer',
+      compatibleArchitectures: [lda.Architecture.X86_64],
+      compatibleRuntimes: [lda.Runtime.PYTHON_3_9]
+    });
+
+    const utilityLayer = new pythonLda.PythonLayerVersion(this, 'UtilityLayer', {
+      layerVersionName: 'PrintMeUtilitiesLayer',
+      entry: 'lib/lambda/utility_layer',
       compatibleArchitectures: [lda.Architecture.X86_64],
       compatibleRuntimes: [lda.Runtime.PYTHON_3_9]
     });
@@ -57,9 +66,41 @@ export class PrintMeStack extends cdk.Stack {
       environment: {
         'TABLE_NAME': table.tableName
       },
-      layers: [domainLayer]
+      layers: [domainLayer, utilityLayer]
     });
     table.grantWriteData(newJobFunction);
+
+    const apiCert = new acm.Certificate(this, 'APICertificate',
+    {
+      domainName: apiSubdomain,
+      validation: acm.CertificateValidation.fromDns(hostedZone)
+    });
+
+    const api = new apigw.RestApi(this, 'RSVPAPI', {
+      restApiName: 'PrintMeAPI',
+      deploy: true,
+      domainName: {
+        domainName: apiSubdomain,
+        certificate: apiCert
+      },
+      disableExecuteApiEndpoint: true
+    });
+
+    const jobPath = api.root.addResource('job');
+    jobPath.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*'],
+      allowMethods: ['GET', 'PUT']
+    });
+    jobPath.addMethod('PUT', new apigw.LambdaIntegration(newJobFunction));
+    // const jobProxyPath = jobPath.addResource('{inviteId}');
+    // jobProxyPath.addCorsPreflight({
+    //   allowOrigins: ['*'],
+    //   allowHeaders: ['*'],
+    //   allowMethods: ['GET', 'PUT']
+    // });
+    // jobProxyPath.addMethod('GET', new apigw.LambdaIntegration(getInviteFunction));
+    // jobProxyPath.addMethod('PUT', new apigw.LambdaIntegration(respondInviteFunction));
 
 
   }
