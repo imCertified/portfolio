@@ -9,14 +9,14 @@ class Job:
         # Required attributes
         self.job_id = job_id
         self.status = status
-        self.created_date = created_date if type(created_date) == datetime.datetime else datetime.datetime.fromisoformat(created_date)  # Marhsall into datetime if not already there
-        self.ttl = ttl if type(ttl) == datetime.datetime else datetime.datetime.fromtimestamp(ttl)  # Marhsall into datetime if not already there
+        self.created_date = created_date if type(created_date) == datetime.datetime else datetime.datetime.fromisoformat(created_date)  # Marhsal into datetime if not already there
+        self.ttl = ttl if type(ttl) == datetime.datetime else datetime.datetime.fromtimestamp(ttl)  # Marhsal into datetime if not already there
 
         # Optional attributes
         self.friendly_name = friendly_name
 
         if fulfilled_date:
-            self.fulfilled_date = fulfilled_date if type(fulfilled_date) == datetime.datetime else datetime.datetime.fromisoformat(fulfilled_date)  # Marhsall into datetime if not already there
+            self.fulfilled_date = fulfilled_date if type(fulfilled_date) == datetime.datetime else datetime.datetime.fromisoformat(fulfilled_date)  # Marhsal into datetime if not already there
         else:
             self.fulfilled_date = None
     
@@ -62,3 +62,11 @@ class Job:
             ddb_rep['fulfilled_date'] = self.fulfilled_date.isoformat()
         
         return ddb_rep
+    
+    @staticmethod
+    def pk_from_id(job_id: str):
+        return f'JOB:{job_id}'
+    
+    @staticmethod
+    def id_from_pk(pk: str):
+        return pk.replace('JOB:', '')
