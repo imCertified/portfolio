@@ -44,13 +44,13 @@ def get_path_param(req: dict, param: str):
     '''
 
     print(f'Getting path param {param} from request')
-    try:
-        if 'pathParameters' in req.keys() and param in req['pathParameters'].keys():
-            print(f'Path param {param} found')
-            return req['pathParameters'][param]           
-    except NonExistentValueError:
-        print(f'Cannot find pathParameters or param {param} in request')
-        return None
+    if 'pathParameters' in req.keys() and param in req['pathParameters'].keys():
+        print(f'Path param {param} found')
+        if req['pathParameters'][param] == '':
+            raise NonExistentValueError
+        
+        return req['pathParameters'][param]
+        
 
 
 def get_body_param(event: dict, key: str, parser: callable = None):
