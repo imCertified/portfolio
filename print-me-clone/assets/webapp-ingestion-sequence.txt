@@ -14,8 +14,12 @@ User->Web Server: Request Webapp
 Web Server->User: Static Webapp
 space 3
 User->Upload Provider: Get Upload URLs
+activate Upload Provider
+Upload Provider->Metadata Store: Track Document
 Upload Provider->User: Upload URLs
-User->Object Store: Store Document(s) w/ Metadata
+
+deactivate Upload Provider
+User->Object Store: Store Document
 
 User->Job Status: Poll
 Job Status->User: Unprocessed
@@ -23,9 +27,10 @@ Job Status->User: Unprocessed
 space -7
 Object Store->Upload Handler: Upload Event
 activate Upload Handler
-Upload Handler->Metadata Store: Track Document(s)
-Upload Handler->Metadata Store: Set Status
+Upload Handler->Upload Handler: Process File
+Upload Handler->Metadata Store: Update Document Status
 space 1
 deactivate Upload Handler
+space -5
 User->Job Status: Poll
 Job Status->User: Code
