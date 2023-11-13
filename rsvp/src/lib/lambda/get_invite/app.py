@@ -1,10 +1,6 @@
 import json
-import boto3
 from os import getenv
-from Invite import Invite
-
-ddb = boto3.resource('dynamodb')
-table = ddb.Table(getenv('TABLE_NAME'))
+from Invite import InviteModel
 
 
 def lambda_handler(event, context):
@@ -14,15 +10,14 @@ def lambda_handler(event, context):
 
     print(f'Request is for invite ID {invite_id}')
     try:
-        invite = Invite.get_from_invite_id(
-            table=table,
-            invite_id=invite_id
-        )
+        invite = InviteModel.get(invite_id)
     except ValueError:
         return {
             'statusCode': 404,
             'body': f'inviteId {invite_id} not found'
         }
+    
+
     
     print(invite.__dict__)
 
